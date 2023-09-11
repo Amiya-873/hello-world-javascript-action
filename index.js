@@ -57,6 +57,8 @@ const port = process.env.INPUT_PORT;
 let requestId = '';
 let intervalId;
 const https = require('https');
+console.log("hostname", hostname);
+console.log("username", username);
 console.log("password", password);
 console.log("authToken", authToken);
 
