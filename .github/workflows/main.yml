@@ -23,5 +23,5 @@ jobs:
           hostname: 'localhost'
           username: 'admin'
           password: ''
-          authToken: '${secrets.AUTH_TOKEN}'
+          authToken: '${{ secrets.AUTH_TOKEN }}'
 
