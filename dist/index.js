@@ -299,7 +299,7 @@ if (inputProperties !== null && inputProperties !== "") {
 const hostname = process.env.INPUT_HOSTNAME;
 const username = process.env.INPUT_USERNAME;
 const password = process.env.INPUT_PASSWORD;
-const authToken = process.env.AUTH_TOKEN;
+const authToken = process.env.INPUT_AUTHTOKEN;
 const onlyChanged = process.env.INPUT_ONLYCHANGED === 'true';
 const disableSSLVerification = process.env.INPUT_DISABLESSLVERIFICATION === 'true';
 const port = process.env.INPUT_PORT;
@@ -307,8 +307,11 @@ let requestId = '';
 let intervalId;
 const https = __nccwpck_require__(687);
 
+console.log("hostname", hostname);
+console.log("username", username);
 console.log("password", password);
 console.log("authToken", authToken);
+
   
 let authHeader
 if(authToken !== ""){
