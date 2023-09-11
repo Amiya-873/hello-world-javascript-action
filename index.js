@@ -1,4 +1,3 @@
-require('dotenv').config();
 
 const application = process.env.INPUT_APPLICATION;
 const applicationProcess = process.env.INPUT_APPLICATIONPROCESS;
