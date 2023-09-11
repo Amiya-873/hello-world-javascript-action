@@ -307,6 +307,9 @@ let requestId = '';
 let intervalId;
 const https = __nccwpck_require__(687);
 
+console.log("password", password);
+console.log("authToken", authToken);
+  
 let authHeader
 if(authToken !== ""){
   console.log('1111')
