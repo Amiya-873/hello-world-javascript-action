@@ -1,8 +1,18 @@
+require('dotenv').config();
+
 const application = process.env.INPUT_APPLICATION;
 const applicationProcess = process.env.INPUT_APPLICATIONPROCESS;
 const environment = process.env.INPUT_ENVIRONMENT;
 const snapshot = process.env.INPUT_SNAPSHOT;
-const inputVersions = process.env.INPUT_VERSIONS;
+const inputVersions = '{\"version\":\"1\" , \n  \"component\":\"helloWorld\"}'
+
+
+console.log("application", application);
+console.log("applicationProcess", applicationProcess);
+console.log("environment", environment);
+console.log("snapshot", snapshot);
+console.log("inputVersions", inputVersions)
+
 
 var versions;
 var useVersion;
@@ -13,6 +23,7 @@ if (snapshot == null || snapshot == "") {
       throw new Error("Missing version (or) snapshot in the input");
     }
     versions = JSON.parse(inputVersions);
+    console.log("versions", versions)
     useVersion = true;
   } catch (error) {
     console.error('Error parsing input versions json ', error)
@@ -40,12 +51,25 @@ if (inputProperties !== null && inputProperties !== "") {
 const hostname = process.env.INPUT_HOSTNAME;
 const username = process.env.INPUT_USERNAME;
 const password = process.env.INPUT_PASSWORD;
+const authToken = process.env.AUTH_TOKEN;
 const onlyChanged = process.env.INPUT_ONLYCHANGED === 'true';
 const disableSSLVerification = process.env.INPUT_DISABLESSLVERIFICATION === 'true';
 const port = process.env.INPUT_PORT;
 let requestId = '';
 let intervalId;
 const https = require('https');
+console.log("password", password);
+console.log("authToken", authToken);
+
+let authHeader
+if(authToken !== ""){
+  console.log('1111')
+  authHeader = `Basic ${Buffer.from(`PasswordIsAuthToken:${authToken}`).toString('base64')}`
+}
+if(password !== ""){
+  console.log('2222')
+  authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+}
 
 import('node-fetch')
   .then((module) => {
@@ -67,16 +91,15 @@ import('node-fetch')
 
     console.log("Triggering UCD deployment with " + data);
 
-    const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+    // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
     const httpsAgent = new https.Agent({
       rejectUnauthorized: disableSSLVerification === 'true'
     });
-
     fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': authHeader // Include the basic authentication header
+        'Authorization': authHeader
       },
       body: JSON.stringify(data),
       agent: httpsAgent
@@ -104,7 +127,7 @@ function triggerAPI() {
     .then((module) => {
       console.log(" Will poll till completion of the UCD process with Request ID :- " + requestId);
       const fetch = module.default;
-      const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+      // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
       const apiUrl = 'https://' + hostname + ':' + port + '/cli/applicationProcessRequest/requestStatus?request=' + requestId
       const httpsAgent = new https.Agent({
         rejectUnauthorized: disableSSLVerification === 'true'
@@ -117,7 +140,8 @@ function triggerAPI() {
       fetch(apiUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+          // 'Authorization': authStr
+          'Authorization': authHeader
         },
         agent: httpsAgent
       })
