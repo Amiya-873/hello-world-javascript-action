@@ -299,12 +299,23 @@ if (inputProperties !== null && inputProperties !== "") {
 const hostname = process.env.INPUT_HOSTNAME;
 const username = process.env.INPUT_USERNAME;
 const password = process.env.INPUT_PASSWORD;
+const authToken = process.env.AUTH_TOKEN;
 const onlyChanged = process.env.INPUT_ONLYCHANGED === 'true';
 const disableSSLVerification = process.env.INPUT_DISABLESSLVERIFICATION === 'true';
 const port = process.env.INPUT_PORT;
 let requestId = '';
 let intervalId;
 const https = __nccwpck_require__(687);
+
+let authHeader
+if(authToken !== ""){
+  console.log('1111')
+  authHeader = `Basic ${Buffer.from(`PasswordIsAuthToken:${authToken}`).toString('base64')}`
+}
+if(password !== ""){
+  console.log('2222')
+  authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+}
 
 __nccwpck_require__.e(/* import() */ 960).then(__nccwpck_require__.bind(__nccwpck_require__, 960))
   .then((module) => {
@@ -326,7 +337,7 @@ __nccwpck_require__.e(/* import() */ 960).then(__nccwpck_require__.bind(__nccwpc
 
     console.log("Triggering UCD deployment with " + data);
 
-    const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+    // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
     const httpsAgent = new https.Agent({
       rejectUnauthorized: disableSSLVerification === 'true'
     });
@@ -376,7 +387,7 @@ function triggerAPI() {
       fetch(apiUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+          'Authorization': authHeader
         },
         agent: httpsAgent
       })
