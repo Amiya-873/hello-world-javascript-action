@@ -380,7 +380,7 @@ function triggerAPI() {
     .then((module) => {
       console.log(" Will poll till completion of the UCD process with Request ID :- " + requestId);
       const fetch = module.default;
-      const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
+      // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
       const apiUrl = 'https://' + hostname + ':' + port + '/cli/applicationProcessRequest/requestStatus?request=' + requestId
       const httpsAgent = new https.Agent({
         rejectUnauthorized: disableSSLVerification === 'true'
