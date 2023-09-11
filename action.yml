@@ -41,7 +41,7 @@ inputs:
     description: 'password'
     required: false
     secret: true
-  authtoken:
+  authToken:
     description: 'auth token'
     required: false
     secret: true
