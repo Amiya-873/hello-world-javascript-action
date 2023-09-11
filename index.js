@@ -50,7 +50,7 @@ if (inputProperties !== null && inputProperties !== "") {
 const hostname = process.env.INPUT_HOSTNAME;
 const username = process.env.INPUT_USERNAME;
 const password = process.env.INPUT_PASSWORD;
-const authToken;
+const authToken = process.env.INPUT_AUTHTOKEN;;
 const onlyChanged = process.env.INPUT_ONLYCHANGED === 'true';
 const disableSSLVerification = process.env.INPUT_DISABLESSLVERIFICATION === 'true';
 const port = process.env.INPUT_PORT;
