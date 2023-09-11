@@ -23,5 +23,5 @@ jobs:
           hostname: 'localhost'
           username: 'admin'
           password: ''
-          authtoken: 'e4abe5d7-965c-4b46-b0a3-2592466b795e'
+          authToken: 'e4abe5d7-965c-4b46-b0a3-2592466b795e'
 
