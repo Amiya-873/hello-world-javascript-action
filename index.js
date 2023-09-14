@@ -1,17 +1,11 @@
+require('dotenv').config();
+
 
 const application = process.env.INPUT_APPLICATION;
 const applicationProcess = process.env.INPUT_APPLICATIONPROCESS;
 const environment = process.env.INPUT_ENVIRONMENT;
 const snapshot = process.env.INPUT_SNAPSHOT;
 const inputVersions = '{\"version\":\"1\" , \n  \"component\":\"helloWorld\"}'
-
-
-console.log("application", application);
-console.log("applicationProcess", applicationProcess);
-console.log("environment", environment);
-console.log("snapshot", snapshot);
-console.log("inputVersions", inputVersions)
-
 
 var versions;
 var useVersion;
@@ -22,7 +16,6 @@ if (snapshot == null || snapshot == "") {
       throw new Error("Missing version (or) snapshot in the input");
     }
     versions = JSON.parse(inputVersions);
-    console.log("versions", versions)
     useVersion = true;
   } catch (error) {
     console.error('Error parsing input versions json ', error)
@@ -33,7 +26,7 @@ if (snapshot == null || snapshot == "") {
   }
 }
 
-const inputProperties = process.env.INPUT_PROPERTIES;
+const inputProperties = ""
 var properties = null;
 if (inputProperties !== null && inputProperties !== "") {
   try {
@@ -50,26 +43,22 @@ if (inputProperties !== null && inputProperties !== "") {
 const hostname = process.env.INPUT_HOSTNAME;
 const username = process.env.INPUT_USERNAME;
 const password = process.env.INPUT_PASSWORD;
-const authToken = process.env.INPUT_AUTHTOKEN;;
+const authToken = process.env.INPUT_AUTHTOKEN;
 const onlyChanged = process.env.INPUT_ONLYCHANGED === 'true';
 const disableSSLVerification = process.env.INPUT_DISABLESSLVERIFICATION === 'true';
 const port = process.env.INPUT_PORT;
 let requestId = '';
 let intervalId;
 const https = require('https');
-console.log("hostname", hostname);
-console.log("username", username);
-console.log("password", password);
-console.log("authToken", authToken);
+console.log(process.env.INPUT_AUTHTOKEN)
 
 let authHeader
 if(authToken !== ""){
-  console.log('1111')
   authHeader = `Basic ${Buffer.from(`PasswordIsAuthToken:${authToken}`).toString('base64')}`
-}
-if(password !== ""){
-  console.log('2222')
+} else if(password !== ""){
   authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`
+} else if (authToken == "" && password == "") {
+   throw new Error("Authentication unsuccessful!, Please provide either UCD password or UCD auth token ");
 }
 
 import('node-fetch')
@@ -92,15 +81,15 @@ import('node-fetch')
 
     console.log("Triggering UCD deployment with " + data);
 
-    // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
     const httpsAgent = new https.Agent({
       rejectUnauthorized: disableSSLVerification === 'true'
     });
+
     fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': authHeader
+        'Authorization': authHeader // Include the basic authentication header
       },
       body: JSON.stringify(data),
       agent: httpsAgent
@@ -123,12 +112,10 @@ import('node-fetch')
 
 
 function triggerAPI() {
-
   import('node-fetch')
     .then((module) => {
       console.log(" Will poll till completion of the UCD process with Request ID :- " + requestId);
       const fetch = module.default;
-      // const authHeader = 'Basic ' + Buffer.from(username + ':' + password).toString('base64');
       const apiUrl = 'https://' + hostname + ':' + port + '/cli/applicationProcessRequest/requestStatus?request=' + requestId
       const httpsAgent = new https.Agent({
         rejectUnauthorized: disableSSLVerification === 'true'
@@ -141,7 +128,6 @@ function triggerAPI() {
       fetch(apiUrl, {
         method: 'GET',
         headers: {
-          // 'Authorization': authStr
           'Authorization': authHeader
         },
         agent: httpsAgent
@@ -152,13 +138,15 @@ function triggerAPI() {
 
           if (result.result === 'SUCCEEDED') {
             console.log('Status is SUCCEEDED. Breaking the loop.');
+            res = 'Status is SUCCEEDED. Breaking the loop.'
             clearInterval(intervalId);
           } else if (['APPROVAL REJECTED','CANCELED','FAILED TO START','FAULTED'].includes(result.result)) {
             console.error('Deployment failed: status = '+ result.result);
             clearInterval(intervalId);
+            res = 'Deployment failed in UCD'
             throw new Error('Deployment failed in UCD')
           }
-          
+          return result
         })
         .catch(error => {
           console.error('Error when getting the deployment status of the request:', error);
@@ -167,8 +155,10 @@ function triggerAPI() {
     })
     .catch((error) => {
       console.error('Error:', error);
-      process.exit(1);
+      // process.exit(1);
     });
 }
 
-
+module.exports = {
+  triggerAPI,
+}
