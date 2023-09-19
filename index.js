@@ -111,7 +111,7 @@ import('node-fetch')
     console.error('Error:', error);
   });
 
-
+console.log('A new Start')
 function triggerAPI() {
   import('node-fetch')
     .then((module) => {
