@@ -19,7 +19,11 @@ jobs:
         node-version: 18 # Change this to your preferred Node.js version
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        npm install sinon
+        npm install chai
+        npm install chai-as-promised
+        npm install # Install any other project-specific dependencies if needed
 
     - name: Run tests
       run: npm test
