@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 
 
@@ -124,7 +125,7 @@ function triggerAPI() {
       if (disableSSLVerification === 'true') {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
       }
-
+      let res
       fetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -146,7 +147,7 @@ function triggerAPI() {
             res = 'Deployment failed in UCD'
             throw new Error('Deployment failed in UCD')
           }
-          return result
+          return res
         })
         .catch(error => {
           console.error('Error when getting the deployment status of the request:', error);
